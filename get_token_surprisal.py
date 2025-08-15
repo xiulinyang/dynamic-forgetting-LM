@@ -73,7 +73,7 @@ def token_surprisals(text: str, model, tokenizer):
     kept_tokens = tokenizer.convert_ids_to_tokens(kept_ids)
     kept_offsets = [o for o, k in zip(shifted_offsets, keep.tolist()) if k]
 
-    cleaned_tokens = [tokenizer.convert_tokens_to_string([x]) for x in kept_tokens]
+    cleaned_tokens = [tokenizer.convert_tokens_to_string([x]).replace(" ", "") for x in kept_tokens]
     return {
         "tokens": cleaned_tokens,
         "token_bits": kept_bits.tolist(),
@@ -98,16 +98,16 @@ def write_surprisal(input_path, output_path, model, tokenizer):
 
 
 def main():
-    model = args.model
+    model_name = args.model
     input_path = args.text_path
     output_path = args.save_path
-    model = AutoModelForCausalLM.from_pretrained(model, torch_dtype=torch.float16, device_map="auto").eval()
-    tokenizer = AutoTokenizer.from_pretrained(model)
+    model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16, device_map="auto").eval()
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     if tokenizer.pad_token_id is None and tokenizer.eos_token_id is not None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
-    write_surprisal(input_path, output_path, model)
+    write_surprisal(input_path, output_path, model, tokenizer)
 
 
 if __name__ == "__main__":
