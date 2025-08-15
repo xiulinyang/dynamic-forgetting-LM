@@ -33,8 +33,6 @@ args = parser.parse_args()
 @torch.no_grad()
 def token_surprisals(text: str, model, tokenizer):
     LN2 = math.log(2.0)
-
-    # 1) Encode *without* auto special tokens; we'll add BOS manually
     enc = tokenizer(
         text,
         return_tensors="pt",
@@ -47,7 +45,7 @@ def token_surprisals(text: str, model, tokenizer):
 
     bos_id = 0
     bos = torch.tensor([[bos_id]], device=input_ids.device)
-    input_ids = torch.cat([bos, input_ids], dim=1)        # [1, 1+T]
+    input_ids = torch.cat([bos, input_ids], dim=1)  
     attn = torch.cat([torch.ones_like(attn[:, :1]), attn], dim=1)
     offsets = [(0, 0)] + offsets
 
